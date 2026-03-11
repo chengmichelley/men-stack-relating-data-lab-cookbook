@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Pantry Item: <%= food.name %></title>
+  </head>
+  <body>
+    <h1>Edit Pantry Item: <%= food.name %></h1>
+    <form
+      action="/users/<%=user._id %>/foods/<%= food.id %>?_method=PUT"
+      method="POST"
+    >
+      <label for="name">Item:</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        value="<%= food.name %>"
+        required
+      />
+      <select id="category" name="category" required>
+        <option value="Dairy">Dairy</option>
+        <option value="Fruit">Fruit</option>
+        <option value="Pantry">Pantry</option>
+        <option value="Produce">Produce</option>
+        <option value="Protein">Protein</option>
+        <option value="Vegetable">Vegetable</option>
+      </select>
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" required />
+
+      <label for="notes">Notes: </label>
+      <textarea
+        name="notes"
+        id="notes"
+        placeholder="Enter details such as brand, size, where to buy?"
+      ></textarea>
+
+      <button type="submit">Update Pantry Item!</button>
+    </form>
+  </body>
+</html>

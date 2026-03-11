@@ -1,52 +1,52 @@
-require('dotenv').config()
+require("dotenv").config();
 
-const express = require('express')
-const app = express()
-const PORT = process.env.IS_DEV ? 3000 : process.env.PORT
-const morgan = require('morgan')
-const methodOverride = require('method-override')
-const authRoutes = require('./controllers/auth')
-const userRoutes = require('./controllers/user')
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 3000;
+const morgan = require("morgan");
+const methodOverride = require("method-override");
+const authController = require("./controllers/auth");
+const userController = require("./controllers/user");
+const foodsController = require("./controllers/food");
+const usersController = require("./controllers/users");
 
-const session = require('express-session')
-const MongoStore = require("connect-mongo")
-const authRequired = require('./middleware/isUserAuthorized')
-const passDataToView = require('./middleware/passDataToView')
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const isSignedIn = require("./middleware/is-signed-in.js");
+const passUserToView = require("./middleware/pass-user-to-view.js");
 
-// Middlewares
-require('./db/connection')
-app.use(morgan('tiny'))
-app.use(express.urlencoded({extended: true}))
-app.use(methodOverride("_method"))
-// Set view engine to ejs
+require("./db/connection");
+app.use(morgan("tiny"));
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
-app.set('view engine', 'ejs') // When this is present we dont need .ejs in our res.renders
+app.set("view engine", "ejs"); 
 
-app.use(session({
+app.use(
+  session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    // cookie: {
-    //     maxAge: 1000000000000000000,
-    // },
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI
-    })
-}))
-// Any routes under this will automatically have user passed to it (if a user is logged in)
-app.use(passDataToView)
+      mongoUrl: process.env.MONGODB_URI,
+    }),
+  }),
+);
+app.use(passUserToView);
 
-//Routes
-app.get('/', (req, res) => {
-    res.render('index', {
-        user: req.session.user
-    })
-})
+app.get("/", (req, res) => {
+  res.render("index", {
+    user: req.session.user,
+  });
+});
 
-app.use('/auth', authRoutes)
+app.use("/auth", authController);
 
-// Any routes defined under this middleware require auth
-app.use(authRequired)
-app.use('/users', userRoutes)
+app.use("/users", usersController);
 
-app.listen(PORT, ()=> console.log(`The port is running on: ${PORT}`))
+app.use(isSignedIn);
+app.use("/user", userController);
+
+app.use("/users/:userId/foods", foodsController);
+
+app.listen(PORT, () => console.log(`The port is running on: ${PORT}`));

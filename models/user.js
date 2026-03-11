@@ -1,18 +1,42 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
+const foodSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    default: 1,
+    required: true,
+  },
+  notes: {
+    type: String,
+    required: false,
+  },
+});
+
+const userSchema = new mongoose.Schema(
+  {
     username: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     hashedPassword: {
-        type: String,
-        required: true
-    }
-}, {
-    timestamps: true
- })
+      type: String,
+      required: true,
+    },
+    pantry: [foodSchema],
+  },
+  {
+    timestamps: true,
+  },
+);
 
- const User = mongoose.model('User', userSchema)
+const User = mongoose.model("User", userSchema);
 
- module.exports = User
+module.exports = User;

@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome Page</title>
+    <title>Welcome To <%= user ? user.username: `Guest` %>'s Cookbook</title>
 </head>
 <body>
     <%- include('partials/_navbar.ejs') %>
+
     <% if(user) { %>
         <h1>Welcome back <%= user.username %></h1>
      <% } else { %>
-        <h1>Welcome to the App</h1>
+        <h1>Welcome To <%= user ? user.username: `Guest` %>'s Cookbook</h1>
         <p>Please <a href="/auth/sign-up">Sign Up</a> or <a href="/auth/sign-in">Sign In</a> </p>
     <% } %>
     
