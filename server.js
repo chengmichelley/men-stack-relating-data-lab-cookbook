@@ -8,7 +8,6 @@ const methodOverride = require("method-override");
 const authController = require("./controllers/auth");
 const userController = require("./controllers/user");
 const foodsController = require("./controllers/food");
-const usersController = require("./controllers/users");
 
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
@@ -42,10 +41,9 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authController);
 
-app.use("/users", usersController);
 
 app.use(isSignedIn);
-app.use("/user", userController);
+app.use("/users", userController);
 
 app.use("/users/:userId/foods", foodsController);
 

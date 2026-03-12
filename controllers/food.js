@@ -8,6 +8,9 @@ const User = require("../models/user.js");
 router.get("/", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     const message = req.session.message;
     req.session.message = null;
     res.locals.pantry = currentUser.pantry;
@@ -23,6 +26,9 @@ router.get("/", async (req, res) => {
 router.get("/new", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     res.render("foods/new.ejs", { userId: req.params.userId });
   } catch (error) {
     res.redirect(`/`);
@@ -34,6 +40,9 @@ router.get("/new", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const currentUser = await User.findById(req.session.user._id);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     const newItem = req.body.name.trim().toLowerCase();
     const sameItem = currentUser.pantry.some((food) => {
       return food.name.trim().toLowerCase() === newItem;
@@ -60,7 +69,13 @@ router.post("/", async (req, res) => {
 router.get("/:itemId", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     const food = currentUser.pantry.id(req.params.itemId);
+    if (!food) {
+      return res.status(404).render("error", { message: "Pantry not found" });
+    }
     res.render("foods/show.ejs", { food: food });
   } catch (error) {
     console.log("SHOW Error", error);
@@ -73,7 +88,13 @@ router.get("/:itemId", async (req, res) => {
 router.get("/:itemId/edit", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     const food = currentUser.pantry.id(req.params.itemId);
+    if (!food) {
+      return res.status(404).render("error", { message: "Pantry not found" });
+    }
     res.render("foods/edit.ejs", { food });
   } catch (error) {
     res.redirect(`/`);
@@ -85,7 +106,13 @@ router.get("/:itemId/edit", async (req, res) => {
 router.put("/:itemId", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     const foodUpdate = currentUser.pantry.id(req.params.itemId);
+    if (!foodUpdate) {
+      return res.status(404).render("error", { message: "Cannot find food item" });
+    }
 
     foodUpdate.set(req.body);
     await currentUser.save();
@@ -101,6 +128,9 @@ router.put("/:itemId", async (req, res) => {
 router.delete("/:itemId", async (req, res) => {
   try {
     const currentUser = await User.findById(req.params.userId);
+    if (!currentUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
     currentUser.pantry.id(req.params.itemId).deleteOne();
     await currentUser.save();
     res.redirect(`/users/${currentUser._id}/foods`);

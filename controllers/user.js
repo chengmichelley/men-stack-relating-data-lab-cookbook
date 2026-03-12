@@ -1,19 +1,43 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const User = require("../models/user");
-const authRequired = require("../middleware/is-signed-in");
+const User = require('../models/user');
+const authRequired = require('../middleware/is-signed-in');
 
 router.get("/me", authRequired, async (req, res) => {
   const currentUser = await User.findById(req.session.user._id);
+  if (!currentUser) {
+    return res.status(404).render("error", { message: "User not found" });
+  }
   res.render("profile", { user: currentUser });
 });
 
 router.get("/", async (req, res) => {
-  if (req.session.user) {
-    const users = await User.find();
-    res.render("users/index", { users });
-  } else {
+  try {
+    const allUsers = await User.find({});
+    if (!allUsers) {
+      return res.status(404).render("error", { message: "Users not found" });
+    }
+    console.log("Users found in DB:", allUsers);
+    res.render("users/index.ejs", { users: allUsers });
+  } catch (error) {
+    console.log(`Error Loading Users`);
     res.redirect("/");
+  }
+});
+
+router.get("/:userId", async (req, res) => {
+  try {
+    const foundUser = await User.findById(req.params.userId);
+    if (!foundUser) {
+      return res.status(404).render("error", { message: "User not found" });
+    }
+    res.render("users/show.ejs", {
+      user: foundUser,
+      pantry: foundUser.pantry,
+    });
+  } catch (error) {
+    console.log("SHOW Error", error);
+    res.redirect(`/users`);
   }
 });
 
